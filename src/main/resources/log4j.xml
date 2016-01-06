@@ -11,7 +11,10 @@
 	</appender>
 	
 	<!-- Application Loggers -->
-	<logger name="com.accenture.haicai">
+	<logger name="com.java.mail.receive">
+		<level value="info" />
+	</logger>
+	<logger name="com.java.mail.send">
 		<level value="info" />
 	</logger>
 	

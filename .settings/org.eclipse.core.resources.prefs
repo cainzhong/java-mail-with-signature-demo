@@ -1,0 +1,8 @@
+eclipse.preferences.version=1
+encoding//src/main/java/com/java/mail/domain/MailSendInfo.java=UTF-8
+encoding//src/main/java/com/java/mail/operation/MailReceiver.java=UTF-8
+encoding//src/main/java/com/java/mail/operation/MailSender.java=UTF-8
+encoding//src/main/java/com/java/mail/util/JCEProviderCheck.java=UTF-8
+encoding//src/main/java/com/java/mail/util/JKSUtil.java=UTF-8
+encoding//src/main/java/com/java/mail/util/X509CertUtil.java=UTF-8
+encoding//src/main/java/com/java/mail/util/X509CertUtilTest.java=UTF-8
