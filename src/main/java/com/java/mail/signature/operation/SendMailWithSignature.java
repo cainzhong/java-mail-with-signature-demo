@@ -61,7 +61,7 @@ public class SendMailWithSignature {
 			PrivateKey privateKey = X509CertUtil.readPrivateKey(subjectAlias, subjectPfxPath, subjectPassword);
 			
 			
-			sendEnvelopedMail("Enveloped Mail Subject", "Enveloped Mail Text", certificate);
+//			sendEnvelopedMail("Enveloped Mail Subject", "Enveloped Mail Text", certificate);
 			sendSignedMail("Signed Mail Subject", "Signed Mail Text", certificate, privateKey);
 
 		} catch (Exception e) {
@@ -70,15 +70,25 @@ public class SendMailWithSignature {
 	}
 
 	private static final String PROVIDER_NAME = "BC";
-	private static final String SIGNATURE_ALGORITHM = "MD5WithRSA";
+	private static final String SIGNATURE_ALGORITHM = "SHA1withRSA";
 	// private static final String SIGNATURE_ALGORITHM = "SHA256withRSA";
 
 	public static Session getSendMailSession() {
 		try {
+			String username = "tao.zhong@hpe.com";
+			String password = "Cisco01!";
+			String smtp = "smtp3.hp.com";
+			
+//			String smtp = "localhost";
+//			String port = "993";
+//			String receivingProtocol = "pop3";
+//			String username = "smart";
+//			String password = "smart";
+			
 			Properties props = System.getProperties();
-			props.put("mail.smtp.host", "127.0.0.1");
+			props.put("mail.smtp.host", smtp);
 			props.put("mail.smtp.auth", "true");
-			Authenticator myauth = new MailAuthenticator("smart", "smart");
+			Authenticator myauth = new MailAuthenticator(username, password);
 			Session session = Session.getDefaultInstance(props, myauth);
 			return session;
 		} catch (Exception e) {
@@ -133,8 +143,10 @@ public class SendMailWithSignature {
 	}
 
 	public static MimeMessage createMimeMessage(String subject, Object content, String contentType, Session session) throws MessagingException {
-		Address fromUser = new InternetAddress("smart");
-		Address toUser = new InternetAddress("smart");
+		Address fromUser = new InternetAddress("tao.zhong@hpe.com");
+		Address toUser = new InternetAddress("tao.zhong@hpe.com");
+//		Address fromUser = new InternetAddress("smart");
+//		Address toUser = new InternetAddress("smart");
 		MimeMessage message = new MimeMessage(session);
 		message.setFrom(fromUser);
 		message.setRecipient(Message.RecipientType.TO, toUser);

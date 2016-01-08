@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyStore;
@@ -40,7 +39,7 @@ public class X509CertUtil {
 	private static final String PROVIDER = "SUN";
 	/* 指定加密算法为RS A */
 	private static final String PUBLIC_KEY_ALGORITHM = "RSA";
-	private static final String SIGNATURE_ALGORITHM = "MD5WithRSA";
+	private static final String SIGNATURE_ALGORITHM = "SHA1withRSA";
 	/* 密钥长度，用来初始化 */
 	private static final int KEYSIZE = 1024;
 
@@ -234,7 +233,7 @@ public class X509CertUtil {
 	 * @throws IOException
 	 */
 	public static X509Certificate readX509Certificate(String crtPath) throws CertificateException, IOException {
-		InputStream inStream = new FileInputStream(crtPath);
+		FileInputStream inStream = new FileInputStream(crtPath);
 		CertificateFactory cf = CertificateFactory.getInstance(CERTIFICATE_TYPE);
 		X509Certificate certificate = (X509Certificate) cf.generateCertificate(inStream);
 		inStream.close();
