@@ -136,7 +136,7 @@ public class ReceiveMailWithSignature {
 		try {
 
 			MimeMessage newmsg = new MimeMessage((MimeMessage) msg);
-			newmsg.setHeader("micalg", "multipart/signed; protocol=application/x-pkcs7-signature; micalg=2.16.840.1.101.3.4.2.1;boundary="----=_NextPart_000_0109_01D1496F.83293B50"");
+//			newmsg.setHeader("micalg", "multipart/signed; protocol=application/x-pkcs7-signature; micalg=2.16.840.1.101.3.4.2.1;boundary="----=_NextPart_000_0109_01D1496F.83293B50"");
 			newmsg.saveChanges();
 			System.out.println("newmsg ContentType(): " + newmsg.getContentType());
 			// SMIMESigned signed = new SMIMESigned((MimeMultipart) newmsg.getContent());
