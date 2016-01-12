@@ -114,11 +114,8 @@
 			<artifactId>mail</artifactId>
 			<version>1.4.5</version>
 		</dependency>
-		<dependency>
-			<groupId>edu.washington.cs.types.checker</groupId>
-			<artifactId>checker-annotated-jdk7</artifactId>
-			<version>1.7.5</version>
-		</dependency>
+		<!-- <dependency> <groupId>edu.washington.cs.types.checker</groupId> <artifactId>checker-annotated-jdk7</artifactId> 
+			<version>1.7.5</version> </dependency> -->
 		<!-- Bouncy Castle Provider -->
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
@@ -156,7 +153,8 @@
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
-					<!-- Suppress javac warning “…is internal proprietary API and may be removed in a future release -->
+					<!-- Suppress javac warning “…is internal proprietary API and may be 
+						removed in a future release -->
 					<!-- http://stackoverflow.com/questions/13855700/suppress-javac-warning-is-internal-proprietary-api-and-may-be-removed-in-a-f -->
 					<compilerArgument>-XDignore.symbol.file</compilerArgument>
 					<showWarnings>true</showWarnings>
