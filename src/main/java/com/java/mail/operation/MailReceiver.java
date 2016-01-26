@@ -32,8 +32,6 @@ import javax.mail.search.SubjectTerm;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.sun.mail.imap.IMAPFolder;
-
 /**
  * Mail Receiver, call sequence: <code>open-> receive-> close</code>
  * 
@@ -45,12 +43,12 @@ public class MailReceiver {
 	public static void main(String args[]) throws MessagingException, UnsupportedEncodingException, IOException {
 		String host = "webmail.hp.com";
 		boolean auth = true;
-//		 you must use SSL for incoming mail, SSL ports are 993 for IMAP and 995 for POP3
+		// you must use SSL for incoming mail, SSL ports are 993 for IMAP and 995 for POP3
 		// String receivingProtocol = "pop3";
 		// SSL
-//		String receivingProtocol = "pop3s";
+		// String receivingProtocol = "pop3s";
 		String port = "993";
-		 String receivingProtocol = "imaps";
+		String receivingProtocol = "imaps";
 		String username = "tao.zhong@hpe.com";
 		String password = "Cisco01!";
 		String attachSavePath = "C:\\saveMail";
@@ -75,11 +73,11 @@ public class MailReceiver {
 	private String attachSavePath;
 
 	private Store store;
-	
-	/*POP3Folder can only receive the mails in 'INBOX', IMAPFolder can receive the mails in all folders which created by user.*/
-	private IMAPFolder inbox;
-//	private POP3Folder inbox;
-	
+
+	/* POP3Folder can only receive the mails in 'INBOX', IMAPFolder can receive the mails in all folders which created by user. */
+	private Folder inbox;
+	// private POP3Folder inbox;
+
 	private FetchProfile profile;
 
 	/**
@@ -116,21 +114,21 @@ public class MailReceiver {
 	 * @throws MessagingException
 	 */
 	public void open() throws MessagingException {
-		Properties props = getProperties();
+		Properties props = this.getProperties();
 		Session session = Session.getDefaultInstance(props, null);
-		
+
 		// URLName urln = new URLName("pop3","webmail.hp.com",995,null, this.username, this.password);
 		// this.store = session.getStore(urln);
 		this.store = session.getStore(this.receivingProtocol);
-		store.connect(this.host, this.username, this.password);
+		this.store.connect(this.host, this.username, this.password);
 
-		this.inbox = (IMAPFolder) store.getFolder("To or Cc me");
-//		this.inbox = (POP3Folder) store.getFolder("INBOX");
-		inbox.open(Folder.READ_ONLY);
+		this.inbox = this.store.getFolder("To or Cc me");
+		// this.inbox = (POP3Folder) store.getFolder("INBOX");
+		this.inbox.open(Folder.READ_ONLY);
 
 		this.profile = new FetchProfile();
-		profile.add(UIDFolder.FetchProfileItem.UID);
-		profile.add(FetchProfile.Item.ENVELOPE);
+		this.profile.add(UIDFolder.FetchProfileItem.UID);
+		this.profile.add(FetchProfile.Item.ENVELOPE);
 	}
 
 	/**
@@ -151,7 +149,7 @@ public class MailReceiver {
 		// Get all the messages from inbox.
 		// Message[] messages = inbox.getMessages();
 		// inbox.fetch(messages, profile);
-		
+
 		List<Message> msgList = new ArrayList<Message>();
 		int i = 1;
 		for (Message msg : messages) {
@@ -165,15 +163,26 @@ public class MailReceiver {
 			// Save attachment
 			String contentType = msg.getContentType();
 			if (contentType.contains("multipart")) {
-				MimeMultipart multi = (MimeMultipart) msg.getContent();
-				System.out.println("Multipart Message: " + multi.getBodyPart(0).getContent());
+				if (msg.isMimeType("multipart/alternative")) {
+					Multipart mp = (Multipart) msg.getContent();
+					int index = 0;
+					if (mp.getCount() > 1) {
+						index = 1;
+					}
+					Part tmp = mp.getBodyPart(index);
+					System.out.println("multipart/alternative Message: " + tmp.getContent());
+				} else {
+					MimeMultipart multi = (MimeMultipart) msg.getContent();
+					System.out.println("Multipart Message: " + multi.getBodyPart(0).getContent());
+				}
+
 			} else if (contentType.contains("application/pkcs7-mime") || contentType.contains("application/x-pkcs7-mime")) {
 				System.out.println("Enveloped Message: " + msg.getContent());
 			} else {
 				System.out.println("Simple Message: " + msg.getContent());
 			}
-			if (StringUtils.isNotEmpty(attachSavePath) && contentType.contains("multipart")) {
-				saveAttachment(msg);
+			if (StringUtils.isNotEmpty(this.attachSavePath) && contentType.contains("multipart")) {
+				this.saveAttachment(msg);
 			}
 			msgList.add(msg);
 			i++;
@@ -186,8 +195,8 @@ public class MailReceiver {
 	 */
 	public void close() {
 		try {
-			inbox.close(false);
-			store.close();
+			this.inbox.close(false);
+			this.store.close();
 		} catch (MessagingException e) {
 			// throw new MailException("关闭INBOX及连接出错", e);
 		}
@@ -215,7 +224,7 @@ public class MailReceiver {
 				String suffix = filename.substring(filename.lastIndexOf(".") + 1);
 				filename = prefix + Calendar.getInstance().getTimeInMillis() + "." + suffix;
 				System.out.println("\t Attachments: " + filename);
-				saveFile(filename, bodyPart.getInputStream());
+				this.saveFile(filename, bodyPart.getInputStream());
 			}
 		}
 	}
@@ -227,7 +236,7 @@ public class MailReceiver {
 	 * @throws FileNotFoundException
 	 */
 	private void saveFile(String filename, InputStream in) throws FileNotFoundException, IOException {
-		File file = new File(attachSavePath + File.separator + filename);
+		File file = new File(this.attachSavePath + File.separator + filename);
 		if (!file.exists()) {
 			// FileCopyUtils.copy(in, new FileOutputStream(file));
 			OutputStream out = null;
@@ -235,18 +244,21 @@ public class MailReceiver {
 				out = new BufferedOutputStream(new FileOutputStream(file));
 				byte[] buf = new byte[8192];
 				int len;
-				while ((len = in.read(buf)) > 0)
+				while ((len = in.read(buf)) > 0) {
 					out.write(buf, 0, len);
+				}
 			} finally {
 				// close streams
 				try {
-					if (in != null)
+					if (in != null) {
 						in.close();
+					}
 				} catch (IOException ex) {
 				}
 				try {
-					if (out != null)
+					if (out != null) {
 						out.close();
+					}
 				} catch (IOException ex) {
 				}
 			}
